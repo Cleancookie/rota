@@ -12,17 +12,25 @@ class RotaService
     public static function makeRota(Collection $jobs, Collection $staff, Timeslot $timeslot): \Illuminate\Support\Collection
     {
         $assignments = collect([]);
+        $preassigned = Assignment::query()
+            ->where('timeslot_id', $timeslot->id)
+            ->get()
+        ;
+
         foreach ($jobs as $i => $job) {
-            // Does this job already have $staff assigned to it?
-            $assignment = Assignment::query()
-                ->with(['job', 'timeslot', 'staff']) // can attach these manually but im being lazy zzz
+            // Does this job already have $staff assigned to it?  this is an N+1 but id rather code be easy to read
+            /** @var Assignment $assignment */
+            $assignment = $preassigned
                 ->where('job_id', $job->id)
                 ->where('timeslot_id', $timeslot->id)
-                ->get()
+                ->first()
             ;
-            if ($assignment->count())
+            if ($assignment !== null)
             {
-                $assignments->push($assignment->first());
+                $assignment->setRelation('job', $job);
+                $assignment->setRelation('timeslot', $timeslot);
+                $assignment->setRelation('staff', $staff->firstWhere('id', $assignment->staff_id));
+                $assignments->push($assignment);
                 continue;
             }
 
@@ -31,7 +39,7 @@ class RotaService
             $assignment->job()->associate($job);
 
             // todo: algorithm to randomly choose a staff member.  Make it less likely to choose someone who recently did $job
-            $chosen = $staff[count($staff) > count($jobs) ? $i % count($jobs) : $i % count($staff)];
+            $chosen = $staff->sortBy('id')[count($staff) > count($jobs) ? $i % count($jobs) : $i % count($staff)];
             $assignment->staff()->associate($chosen);
             $assignment->timeslot()->associate($timeslot);
             $assignment->save();

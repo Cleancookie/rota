@@ -20,4 +20,9 @@ class Timeslot extends Model
     {
         return $this->belongsToMany(Staff::class)->withTimestamps();
     }
+
+    public function assignments()
+    {
+        return $this->belongsToMany(Assignment::class);
+    }
 }
