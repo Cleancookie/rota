@@ -9,13 +9,16 @@ use Illuminate\Database\Eloquent\Collection;
 
 class RotaService
 {
-    public static function makeRota(Collection $jobs, Collection $staff, Timeslot $timeslot): \Illuminate\Support\Collection
+    public static function makeRota(Collection $jobs, Collection $staff, Timeslot $timeslot)
     {
         $assignments = collect([]);
         $preassigned = Assignment::query()
             ->where('timeslot_id', $timeslot->id)
             ->get()
         ;
+        $takenStaff = collect([]);
+        $takenJobs = collect([]);
+        $openStaff = $staff;
 
         foreach ($jobs as $i => $job) {
             // Does this job already have $staff assigned to it?  this is an N+1 but id rather code be easy to read
@@ -31,21 +34,40 @@ class RotaService
                 $assignment->setRelation('timeslot', $timeslot);
                 $assignment->setRelation('staff', $staff->firstWhere('id', $assignment->staff_id));
                 $assignments->push($assignment);
-                continue;
+            } else {
+                // Are there any available staff left?
+                if ($takenStaff->count() >= $staff->count()) {
+                    break;
+                }
+
+                // Assign a $staff to this $job
+                $assignment = new Assignment();
+                $assignment->job()->associate($job);
+
+                // todo: algorithm to randomly choose a staff member.  Make it less likely to choose someone who recently did $job
+                $chosen = $openStaff->random();
+                $assignment->staff()->associate($chosen);
+                $assignment->timeslot()->associate($timeslot);
+                $assignment->save();
+                $assignments->push($assignment);
             }
 
-            // Assign a $staff to this $job
-            $assignment = new Assignment();
-            $assignment->job()->associate($job);
-
-            // todo: algorithm to randomly choose a staff member.  Make it less likely to choose someone who recently did $job
-            $chosen = $staff->sortBy('id')[count($staff) > count($jobs) ? $i % count($jobs) : $i % count($staff)];
-            $assignment->staff()->associate($chosen);
-            $assignment->timeslot()->associate($timeslot);
-            $assignment->save();
-            $assignments->push($assignment);
+            $openStaff = $openStaff->filter(function ($staff) use ($assignment) {
+                return $staff !== $assignment->staff;
+            });
+            $takenStaff->push($assignment->staff);
+            $takenJobs->push($assignment->job);
         }
 
-        return $assignments;
+        return [
+            'assignments' => $assignments,
+            'openStaff' => $staff->filter(function ($person) use ($takenStaff) {
+                return !$takenStaff->contains($person);
+            }),
+            'openJobs' => $jobs->filter(function ($job) use ($takenJobs) {
+                return !$takenJobs->contains($job);
+            }),
+            'timeslot' => $timeslot,
+        ];
     }
 }
