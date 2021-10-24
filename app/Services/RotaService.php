@@ -2,7 +2,6 @@
 
 namespace App\Services;
 
-
 use App\Models\Assignment;
 use App\Models\Timeslot;
 use Illuminate\Database\Eloquent\Collection;
@@ -45,6 +44,9 @@ class RotaService
                 $assignment->job()->associate($job);
 
                 // todo: algorithm to randomly choose a staff member.  Make it less likely to choose someone who recently did $job
+                if ($openStaff->count() === 0) {
+                    break;
+                }
                 $chosen = $openStaff->random();
                 $assignment->staff()->associate($chosen);
                 $assignment->timeslot()->associate($timeslot);
@@ -55,15 +57,12 @@ class RotaService
             $openStaff = $openStaff->filter(function ($staff) use ($assignment) {
                 return $staff !== $assignment->staff;
             });
-            $takenStaff->push($assignment->staff);
             $takenJobs->push($assignment->job);
         }
 
         return [
             'assignments' => $assignments,
-            'openStaff' => $staff->filter(function ($person) use ($takenStaff) {
-                return !$takenStaff->contains($person);
-            }),
+            'openStaff' => $openStaff,
             'openJobs' => $jobs->filter(function ($job) use ($takenJobs) {
                 return !$takenJobs->contains($job);
             }),
