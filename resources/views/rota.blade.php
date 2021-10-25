@@ -1,5 +1,5 @@
 <x-layout>
-    <div class="container">
+    <div class="container-fluid">
         @foreach($timeslotRotas as $timeslot)
         <hr>
         <div class="row print-break">
@@ -22,7 +22,7 @@
                     </tbody>
                 </table>
             </div>
-            <div class="col">
+            <div class="col d-print-none">
                 @if (count($timeslot['openJobs']))
                     <h3>Open jobs:</h3>
                     <ul>

@@ -16,6 +16,6 @@ class HomeController extends Controller
             return RotaService::makeRota($timeslot->jobs, $timeslot->staff, $timeslot);
         });
 
-        return view('home', ['timeslotRotas' => $timeslotRotas]);
+        return view('rota', ['timeslotRotas' => $timeslotRotas]);
     }
 }
