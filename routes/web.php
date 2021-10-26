@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\admin\AdminController;
 use App\Http\Controllers\admin\JobController;
 use App\Http\Controllers\admin\StaffController;
 use App\Http\Controllers\admin\TimeslotController;
@@ -20,6 +21,7 @@ use Illuminate\Support\Facades\Route;
 Route::get('/', [HomeController::class, 'index']);
 
 Route::name('admin.')->prefix('admin')->group(function() {
+    Route::get('', [AdminController::class, 'show'])->name('show');
     Route::resource('timeslots', TimeslotController::class);
     Route::resource('jobs', JobController::class);
     Route::resource('staff', StaffController::class);

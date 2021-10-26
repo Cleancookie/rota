@@ -3,9 +3,10 @@
 namespace App\Http\Controllers\admin;
 
 use App\Http\Controllers\Controller;
+use App\Models\Job;
 use Illuminate\Http\Request;
 
-class JobController extends AdminController
+class JobController extends Controller
 {
     /**
      * Display a listing of the resource.
@@ -14,7 +15,9 @@ class JobController extends AdminController
      */
     public function index()
     {
-        //
+        return view('admin.jobs.index', [
+            'jobs' => Job::all(),
+        ]);
     }
 
     /**
