@@ -1,14 +1,11 @@
 <x-admin-layout>
-    <div class="row">
-        <div class="col">
-            <h1>Timeslots</h1>
-        </div>
-    </div>
-
+    @slot('title')
+        Timeslot
+    @endslot
     <table class="table table-striped">
         <thead>
         <tr>
-            <th>id</th>
+            <th>#</th>
             <th>Name</th>
             <th>Start Time</th>
             <th></th>
@@ -29,7 +26,7 @@
                             </div>
                             <div class="mb-3">
                                 <label for="start{{ $timeslot->id }}" class="form-label">Start Time</label>
-                                <input type="text" class="form-control" id="start{{ $timeslot->id }}" value="{{ $timeslot->start }}">
+                                <input type="time" class="form-control" id="start{{ $timeslot->id }}" value="{{ $timeslot->start }}">
                             </div>
                         </x-modals.edit-modal>
                     </td>

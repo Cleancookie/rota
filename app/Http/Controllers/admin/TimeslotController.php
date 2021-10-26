@@ -83,9 +83,9 @@ class TimeslotController extends Controller
      */
     public function destroy(Timeslot $timeslot)
     {
-        dd($timeslot);
         $timeslot->delete();
         request()->session()->flash('success', 'Timeslot deleted');
-        redirect()->route('admin.timeslots.index');
+
+        return redirect()->route('admin.timeslots.index');
     }
 }

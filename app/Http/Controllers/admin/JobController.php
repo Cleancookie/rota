@@ -4,6 +4,7 @@ namespace App\Http\Controllers\admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\Job;
+use App\Models\Timeslot;
 use Illuminate\Http\Request;
 
 class JobController extends Controller
@@ -16,7 +17,8 @@ class JobController extends Controller
     public function index()
     {
         return view('admin.jobs.index', [
-            'jobs' => Job::all(),
+            'jobs' => Job::query()->with('timeslot')->get(),
+            'timeslots' => Timeslot::all(),
         ]);
     }
 

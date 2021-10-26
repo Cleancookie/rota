@@ -40,6 +40,16 @@
     <div class="row">
         <div class="col">
             <div class="container">
+                <div class="row">
+                    <div class="col">
+                        <h2>{{ $title ?? '' }}</h2>
+                    </div>
+                    <div class="col">
+                        @if(Session::has('success'))
+                            <div class="alert alert-success">{{ Session::get('success') }}</div>
+                        @endif
+                    </div>
+                </div>
                 {{ $slot }}
             </div>
         </div>

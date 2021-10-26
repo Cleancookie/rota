@@ -1,14 +1,13 @@
 <x-admin-layout>
-        <div class="row">
-            <div class="col">
-                <h1>Staff</h1>
-            </div>
-        </div>
+    @slot('title')
+       Staff
+    @endslot
+
 
     <table class="table table-striped">
         <thead>
         <tr>
-            <th>id</th>
+            <th>#</th>
             <th>Name</th>
             <th></th>
             <th></th>

@@ -1,14 +1,13 @@
 <x-admin-layout>
-    <div class="row">
-        <div class="col">
-            <h1>Jobs</h1>
-        </div>
-    </div>
+    @slot('title')
+       Jobs
+    @endslot
+
 
     <table class="table table-striped">
         <thead>
         <tr>
-            <th>id</th>
+            <th>#</th>
             <th>Name</th>
             <th></th>
             <th></th>
@@ -25,6 +24,21 @@
                                 <label for="name{{ $job->id }}" class="form-label">Name</label>
                                 <input type="text" class="form-control" id="name{{ $job->id }}" value="{{ $job->name }}">
                             </div>
+                            <hr>
+                            @foreach ($timeslots as $key => $timeslot)
+                                <div class="form-check">
+                                    <input
+                                        class="form-check-input"
+                                        type="radio"
+                                        name="timeslot"
+                                        value="{{ $timeslot->id }}"
+                                        id="flexCheck-{{ $key }}" {{ $job->timeslot == $timeslot ? 'checked' : '' }}>
+                                    <label class="form-check-label" for="flexCheck-{{ $key }}">
+                                        {{ $timeslot->name }} ({{ $timeslot->start }})
+                                    </label>
+                                </div>
+                            @endforeach
+
                         </x-modals.edit-modal>
                     </td>
                     <td>
